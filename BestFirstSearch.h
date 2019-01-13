@@ -6,56 +6,92 @@
 #define PROJECT_BESTFIRSTSEARCH_H
 
 #include <queue>
-#include <unordered_set>
 #include "Searcher.h"
+
+
+template<class T>
+struct CmpStates
+{
+    bool operator()(const State<T>* left, const State<T>* right) const
+    {
+        return *left > *right;
+    }
+};
 
 template<class T>
 class BestFirstSearch : public Searcher<T>{
-    priority_queue<State<T>,vector<State<T>>,std::greater<State<T>>> myQueue;
-    unordered_set<State<T>> closed;
-    list<State<T>> backTrace(State<T> state,State<T> first) {
-        list<State<T>> trace;
-        while (!(state == first)) {
+    priority_queue<State<T>*,vector<State<T>*>,/*std::greater<State<T>*>*/ CmpStates<T>> myQueue;
+    list<State<T>*> closed;
+    list<State<T>*> backTrace(State<T>* state,State<T>* first) {
+        list<State<T>*> trace;
+        while (!(*state == *first)) {
             trace.push_back(state);
-            state = state.getCameFrom();
+            state = state->getCameFrom();
         }
         trace.push_back(state);
         return trace;
     }
-    bool openListContains(State<T> state) {
-        priority_queue<State<T>,vector<State<T>>
-                ,std::greater<State<T>>> tempQueue = myQueue;
+    bool openListContains(State<T>* state) {
+        priority_queue<State<T>*,vector<State<T>*>, CmpStates<T>
+               /* ,std::greater<State<T>*>*/> tempQueue = myQueue;
         while (tempQueue.size() > 0) {
-            State<T> temp = tempQueue.top();
-            if(temp == state) {
+            State<T>* temp = tempQueue.top();
+            if(*temp == *state) {
                 return true;
             }
             tempQueue.pop();
         }
         return false;
     }
+    bool closeListContains(State<T>* state) {
+        for (auto it : closed) {
+            if (*state == *it) {
+                return true;
+            }
+        }
+        return false;
+    }
+    void updateList(State<T>* node, State<T>* prev) {
+        for (auto it : closed) {
+            if (*node == *it) {
+                node->setCameFrom(prev);
+            }
+        }
+    }
+    void updateCameFrom(State<T>* node, State<T>* prev) {
+        for (auto it : closed) {
+            if (*prev == *it) {
+                node->setCameFrom(prev);
+            }
+        }
+    }
+
+
 public:
-    list<State<T>> search(Searchable<T>* s) {
+    list<State<T>*> search(Searchable<T>* s) {
+        s->initializeMatrix();
         // inherited from Searcher
         myQueue.push(s->getInitialState());
         while (myQueue.size() > 0) {
             // inherited from Searcher, removes the best state
-            State<T> n = myQueue.top();
+            State<T>* n = myQueue.top();
             myQueue.pop();
-            closed.insert(n);
+            closed.push_back(n);
             // private method, back traces through the parents
             // calling the delegated method, returns a list of states with n as a parent
-            if (n == s->getGoalState()) {
+            if (*n == *s->getGoalState()) {
                 return backTrace(n,s->getInitialState());
             }
-            list<State<T>> succerssors = s->getAllPossibleStates(n);
+            list<State<T>*> succerssors = s->getAllPossibleStates(n);
             for (auto it : succerssors) {
-                if ((closed.find(it) == closed.end()) && !openListContains(it)) {
-                    (it).setCameFrom(n);
+                if (!closeListContains(it) && !openListContains(it)) {
+                    // find the real address of n, and set came from of it
+                    updateCameFrom(it,n);
                     myQueue.push(it);
                 } else {
                     if(!openListContains(it)) {
-                        myQueue.push(it);
+                        // find the real address of n, and update its came from
+                        updateList(n,it);
                     }
                 }
             }

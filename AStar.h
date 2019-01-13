@@ -45,12 +45,12 @@ public:
             allMap[x][y].parentX = x;
             allMap[x][y].parentY = y;
 
-            vector<Node> openList;
+            vector<State<T>> openList;
             openList.emplace_back(allMap[x][y]);
             bool destinationFound = false;
 
             while (!openList.empty()&&openList.size()<(X_MAX / X_STEP)*(Y_MAX / Y_STEP)) {
-                Node node;
+                State<T> node;
                 do {
                     //This do-while loop could be replaced with extracting the first
                     //element from a set, but you'd have to make the openList a set.
@@ -58,10 +58,8 @@ public:
                     //it with a vector, but for now it's still an option, although
                     //not as good as a set performance wise.
                     float temp = FLT_MAX;
-                    vector<Node>::iterator itNode;
-                    for (vector<Node>::iterator it = openList.begin();
-                         it != openList.end(); it = next(it)) {
-                        Node n = *it;
+                    for (auto it : openList) {
+                        State<T> n = *it;
                         if (n.fCost < temp) {
                             temp = n.fCost;
                             itNode = it;
@@ -80,18 +78,18 @@ public:
                     for (int newY = -1; newY <= 1; newY++) {
                         double gNew, hNew, fNew;
                         if (isValid(x + newX, y + newY)) {
-                            if (isDestination(x + newX, y + newY, dest))
+                            if (isDestination(x + newX, y + newY, s->getGoalState()))
                             {
                                 //Destination found - make path
                                 allMap[x + newX][y + newY].parentX = x;
                                 allMap[x + newX][y + newY].parentY = y;
                                 destinationFound = true;
-                                return makePath(allMap, dest);
+                                return makePath(allMap, s->getGoalState());
                             }
                             else if (closedList[x + newX][y + newY] == false)
                             {
                                 gNew = node.gCost + 1.0;
-                                hNew = calculateH(x + newX, y + newY, dest);
+                                hNew = calculateH(x + newX, y + newY, s->getGoalState());
                                 fNew = gNew + hNew;
                                 // Check if this path is better than the one already present
                                 if (allMap[x + newX][y + newY].fCost == FLT_MAX ||
@@ -117,4 +115,4 @@ public:
         }
 };
 #endif //PROJECT2_ASTAR_H
-*/
+ */

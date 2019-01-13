@@ -39,18 +39,17 @@ string MatrixSolver::parseFinalState(string &myString){
     return myFinalString;
 }
 
-void MatrixSolver::createMatrix(string myString) {
+void MatrixSolver::createMatrix(string &myString) {
     int tempRowNum = 0;
     string oneRow = "";
-    string restOfMatrix = myString;
-    while (restOfMatrix.length() > 0) {
-        unsigned long rc = restOfMatrix.find('|');
-        oneRow = restOfMatrix.substr(0, rc + 1);
+    while (tempRowNum < rowNumber) {
+        unsigned long rc = myString.find('|');
+        oneRow = myString.substr(0, rc + 1);
         deleteSpaces(oneRow);
         vector<State<pair<int, int>>> temp = parseOneRow(oneRow, tempRowNum);
         myMatrix.push_back(temp);
         // get ready for next row
-        restOfMatrix = restOfMatrix.substr(rc + 1, restOfMatrix.length());
+        myString = myString.substr(rc + 1, myString.length());
         tempRowNum++;
     }
 }
@@ -121,29 +120,31 @@ string MatrixSolver::findShortestWay(State<pair<int, int>> start,State<pair<int,
     BFS<pair<int,int>> myBFS;
     //AStar<pair<int,int>> myAStar;
 
-    list<State<pair<int,int>>> tempList1 = myDFS.search(mySearchable);
-    list<State<pair<int,int>>> tempList2 = myBestFirst.search(mySearchable);
-    list<State<pair<int,int>>> tempList3 = myBFS.search(mySearchable);
-    //list<State<pair<int,int>>> tempList4 = myAStar.search(mySearchable);
+    list<State<pair<int,int>>*> tempList1 = myDFS.search(mySearchable);
+    list<State<pair<int,int>>*> tempList2 = myBestFirst.search(mySearchable);
+    list<State<pair<int,int>>*> tempList3 = myBFS.search(mySearchable);
+    //list<State<pair<int,int>>*> tempList4 = myAStar.search(mySearchable);
 
-    MatrixSolution mySolutionDFS (tempList1);
-    MatrixSolution mySolutionBestFirst (tempList2);
-    MatrixSolution mySolutionBFS (tempList3);
-    //MatrixSolution mySolutionAStar (tempList4);
+    list<list<State<pair<int,int>>*>> myList;
+    myList.push_back(tempList1);
+    myList.push_back(tempList2);
+    myList.push_back(tempList3);
+   // myList.push_back(tempList4);
 
-    string minSolution = chooseBestAlg(mySolutionBestFirst, mySolutionBFS, mySolutionBFS);
+    string minSolution = chooseBestAlg(myList);
     return minSolution;
 }
 
-string MatrixSolver::chooseBestAlg(MatrixSolution &mySolutionBestFirst,
-           MatrixSolution &mySolutionBFS, MatrixSolution &mySolutionDFS/*,MatrixSolution &mySolutionAStar*/) {
-    list<MatrixSolution> myList;
-    myList.push_back(mySolutionBestFirst);
-    myList.push_back(mySolutionBFS);
-    myList.push_back(mySolutionDFS);
-    //myList.push_back(mySolutionAStar);
-    myList.sort();
-    myList.reverse();
-    string directionMin = myList.front().getDirectionString();
-    return directionMin;
+string MatrixSolver::chooseBestAlg(list<list<State<pair<int,int>>*>> myList) {
+    MatrixSolution mySolution;
+    list<State<pair<int,int>>*> minList = myList.front();
+    double minCost = mySolution.calcCost(minList);
+    for (auto it : myList) {
+        double h = mySolution.calcCost(it);
+        if (h < minCost) {
+            minList = it;
+            minCost = mySolution.calcCost(it);
+        }
+    }
+    return mySolution.getDirectionString(minList);
 }

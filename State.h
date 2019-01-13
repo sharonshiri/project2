@@ -5,7 +5,7 @@ template <class T>
 class State {
     T myState;
     double cost;
-    State<T>* cameFrom = nullptr; // the state we came from to this state (setter)
+    State<T>* cameFrom= nullptr; // the state we came from to this state (setter)
 public:
     State(){}
     State(T s, double cost) {
@@ -16,11 +16,11 @@ public:
     {
      return ((this->cost == s.cost) && (myState == s.myState));
     }
-    bool operator<(State<T> s) // we overload Object's < method
+    bool operator<(const State<T> s) const// we overload Object's < method
     {
         return this->cost < s.cost;
     }
-    bool operator>(State<T> s) // we overload Object's > method
+    bool operator>(const State<T> s) const // we overload Object's > method
     {
         return this->cost > s.cost;
     }

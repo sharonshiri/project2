@@ -24,16 +24,14 @@
 class MatrixSolver : public Solver {
     int rowNumber,colNumber;
     vector<vector<State<pair<int, int>>>> myMatrix;
-    void createMatrix(string stringMatrix);
+    void createMatrix(string &stringMatrix);
     vector<State<pair<int, int>>> parseOneRow(string, int row);
     string getParam(string &message);
-    // void parseSizeOfMatrix(string &myString,int&,int&);
     string parseStartState(string &myString);
     string parseFinalState(string &myString);
     State<pair<int, int>> getStateFromMatrix(string);
     void deleteSpaces(string &line);
-    string chooseBestAlg(MatrixSolution &mySolutionBestFirst,
-               MatrixSolution &mySolutionBFS, MatrixSolution &mySolutionDFS);
+    string chooseBestAlg(list<list<State<pair<int,int>>*>> myList);
     string findShortestWay(State<pair<int, int>>,State<pair<int, int>>);
 public:
     string solve(string stringMatrix);

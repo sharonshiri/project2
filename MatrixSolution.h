@@ -12,16 +12,12 @@
 using namespace std;
 
 class MatrixSolution {
-    list<State<pair<int,int>>> myList;
-    double cost;
-    string getCurrDirection(State<pair<int,int>> first, State<pair<int,int>> second);
+    string getCurrDirection(State<pair<int,int>>* first, State<pair<int,int>>* second);
 public:
 
-    MatrixSolution(list<State<pair<int,int>>>);
-    double getCostOfTrace();
-    string getPairString();
-    string getDirectionString();
-    bool operator<(MatrixSolution other);
+    double calcCost(list<State<pair<int,int>>*> list);
+    string getPairString(list<State<pair<int,int>>*>);
+    string getDirectionString(list<State<pair<int,int>>*>);
 };
 
 

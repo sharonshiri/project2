@@ -5,33 +5,52 @@
 
 template<class T>
 class BFS : public Searcher<T> {
-    list<State<T>> visited;
+    list<State<T>*> visited;
+    list<State<T>*> backTrace(State<T>* state,State<T>* first) {
+        list<State<T>*> trace;
+        while (!(*state == *first)) {
+            trace.push_back(state);
+            state = state->getCameFrom();
+        }
+        trace.push_back(state);
+        return trace;
+    }
+    bool visitedContains(State<T>* state) {
+        for (auto it: visited) {
+            if(*it == *state) {
+                return true;
+            }
+        }
+        return false;
+    }
 public:
-    list<State<T>> search(Searchable<T>* s) {
+    list<State<T>*> search(Searchable<T>* s) {
         // Create a queue for BFS
-        queue<State<T>> myQueue;
+        queue<State<T>*> myQueue;
         // Mark the current node as visited and enqueue it
-        State<T> curr = s->getInitialState();
-        visited.push_back(curr);
+        State<T>* curr = s->getInitialState();
         myQueue.push(curr);
         // vertices of a vertex
         while(!myQueue.empty())
         {
             // Dequeue a vertex from queue and print it
             curr = myQueue.front();
-            myQueue.pop_front();
-            list<State<T>> adj = s->getAllPossibleStates(curr);
+            if(*curr == *(s->getGoalState())){
+                return backTrace(curr,s->getInitialState());
+            }
+            myQueue.pop();
+            list<State<T>*> adj = s->getAllPossibleStates(curr);
+            visited.push_back(curr);
             // Get all adjacent vertices of the dequeued
             // vertex s. If a adjacent has not been visited,
             // then mark it visited and enqueue it
             // 'i' will be used to get all adjacent
-            list<int>::iterator i;
-            for (i = adj[s].begin(); i != adj[s].end(); ++i)
+            for (auto i : adj)
             {
-                if (!visited[*i])
+                if (!visitedContains(i))
                 {
-                    visited[*i] = true;
-                    myQueue.push_back(*i);
+                    i->setCameFrom(curr);
+                    myQueue.push(i);
                 }
             }
         }
