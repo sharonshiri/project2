@@ -19,7 +19,7 @@
 #include "DFS.h"
 #include "BestFirstSearch.h"
 #include "BFS.h"
-//#include "AStar.h"
+#include "AStar.h"
 
 class MatrixSolver : public Solver {
     int rowNumber,colNumber;
@@ -30,7 +30,6 @@ class MatrixSolver : public Solver {
     string parseStartState(string &myString);
     string parseFinalState(string &myString);
     State<pair<int, int>> getStateFromMatrix(string);
-    void deleteSpaces(string &line);
     string chooseBestAlg(list<list<State<pair<int,int>>*>> myList);
     string findShortestWay(State<pair<int, int>>,State<pair<int, int>>);
 public:

@@ -31,10 +31,6 @@ void MySerialServer::myThread() {
             char readBuffer[1025] = {0};
             string writeString = "";
             string readString = "";
-            //simple::mem_ostream s;
-          //  streambuf* k ;
-            //iostream writeStream;
-            // listen
             if (listen(myListenSocket, 1) < 0) {
                 throw runtime_error("listen failed");
             }
@@ -68,9 +64,13 @@ void MySerialServer::myThread() {
                 cout << "result === " << writeString << endl;
                 send(myClientSocket, writeString.c_str(), writeString.length(), 0);
             }
+            // prepare to next client
+            if (myClientSocket != -1) {
+                close(myClientSocket);
+            }
             timeout.tv_sec = 10;
         }
-};
+}
 
 
 /*
@@ -117,8 +117,5 @@ void MySerialServer::stop() {
 MySerialServer::~MySerialServer() {
     continueThread = false;
     close(myListenSocket);
-    if (myClientSocket != -1) {
-        close(myClientSocket);
-    }
     pthread_join(waitForClient, nullptr);
 }

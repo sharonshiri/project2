@@ -8,7 +8,8 @@ string MatrixSolver::solve(string myString) {
     //parseSizeOfMatrix(myString, row, col);
     //string startString = parseStartState(myString);
     //string finalString = parseFinalState(myString);
-    rowNumber = count(myString.begin(), myString.end(), '|') - 2;
+    myMatrix.clear();
+    rowNumber = count(myString.begin(), myString.end(), '\n') - 2;
     createMatrix(myString);
     string startString = parseStartState(myString);
     string finalString = parseFinalState(myString);
@@ -17,23 +18,16 @@ string MatrixSolver::solve(string myString) {
     return findShortestWay(start, final);
 }
 
-/*void MatrixSolver::parseSizeOfMatrix(string& myString, int&row, int&col) {
-    unsigned long endLine = myString.find('|');
-    unsigned long rc = myString.find(',');
-    row = stoi(myString.substr(0, rc));
-    col = stoi(myString.substr(rc+1, endLine));
-    myString.erase(0,endLine+1);
-}*/
 
 string MatrixSolver::parseStartState(string &myString) {
-    unsigned long rc = myString.find('|');
+    unsigned long rc = myString.find('\n');
     string myStartString = myString.substr(0, rc);
     myString.erase(0,rc+1);
     return myStartString;
 }
 
 string MatrixSolver::parseFinalState(string &myString){
-    unsigned long rc = myString.find('|');
+    unsigned long rc = myString.find('\n');
     string myFinalString = myString.substr(0, rc);
     myString.erase(0,rc+1);
     return myFinalString;
@@ -43,9 +37,8 @@ void MatrixSolver::createMatrix(string &myString) {
     int tempRowNum = 0;
     string oneRow = "";
     while (tempRowNum < rowNumber) {
-        unsigned long rc = myString.find('|');
+        unsigned long rc = myString.find('\n');
         oneRow = myString.substr(0, rc + 1);
-        deleteSpaces(oneRow);
         vector<State<pair<int, int>>> temp = parseOneRow(oneRow, tempRowNum);
         myMatrix.push_back(temp);
         // get ready for next row
@@ -54,17 +47,7 @@ void MatrixSolver::createMatrix(string &myString) {
     }
 }
 
-void MatrixSolver::deleteSpaces(string &line) {
-    while (line.length() > 0) {
-        unsigned long rc = line.find(' ');
-        if (rc != string::npos) {
-            line.erase(rc, 1);
-        } else {
-            // no more spaces, break
-            break;
-        }
-    }
-}
+
 
 string MatrixSolver::getParam(string &message) {
     string param;
@@ -115,21 +98,21 @@ string MatrixSolver::findShortestWay(State<pair<int, int>> start,State<pair<int,
     MatrixSearchable<pair<int,int>>* mySearchable = new MatrixSearchable<pair<int,int>>
                     (myMatrix,start,final,rowNumber,colNumber);
 
-    DFS<pair<int,int>> myDFS;
-    BestFirstSearch<pair<int,int>> myBestFirst;
-    BFS<pair<int,int>> myBFS;
-    //AStar<pair<int,int>> myAStar;
+    //DFS<pair<int,int>> myDFS;
+    //BestFirstSearch<pair<int,int>> myBestFirst;
+    //BFS<pair<int,int>> myBFS;
+    AStar<pair<int,int>> myAStar;
 
-    list<State<pair<int,int>>*> tempList1 = myDFS.search(mySearchable);
-    list<State<pair<int,int>>*> tempList2 = myBestFirst.search(mySearchable);
-    list<State<pair<int,int>>*> tempList3 = myBFS.search(mySearchable);
-    //list<State<pair<int,int>>*> tempList4 = myAStar.search(mySearchable);
+    //list<State<pair<int,int>>*> tempList1 = myDFS.search(mySearchable);
+    //list<State<pair<int,int>>*> tempList2 = myBestFirst.search(mySearchable);
+    //list<State<pair<int,int>>*> tempList3 = myBFS.search(mySearchable);
+    list<State<pair<int,int>>*> tempList4 = myAStar.search(mySearchable);
 
     list<list<State<pair<int,int>>*>> myList;
-    myList.push_back(tempList1);
-    myList.push_back(tempList2);
-    myList.push_back(tempList3);
-   // myList.push_back(tempList4);
+   // myList.push_back(tempList1);
+   // myList.push_back(tempList2);
+   // myList.push_back(tempList3);
+    myList.push_back(tempList4);
 
     string minSolution = chooseBestAlg(myList);
     return minSolution;
@@ -140,10 +123,12 @@ string MatrixSolver::chooseBestAlg(list<list<State<pair<int,int>>*>> myList) {
     list<State<pair<int,int>>*> minList = myList.front();
     double minCost = mySolution.calcCost(minList);
     for (auto it : myList) {
-        double h = mySolution.calcCost(it);
-        if (h < minCost) {
-            minList = it;
-            minCost = mySolution.calcCost(it);
+        if (!(it.empty())) {
+            double h = mySolution.calcCost(it);
+            if (h < minCost) {
+                minList = it;
+                minCost = mySolution.calcCost(it);
+            }
         }
     }
     return mySolution.getDirectionString(minList);

@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include "MySerialServer.h"
+#include "MyParallelServer.h"
 
 #include "MyTestClientHandler.h"
 #include "MatrixSolver.h"

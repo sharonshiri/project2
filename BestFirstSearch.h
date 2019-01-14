@@ -20,7 +20,7 @@ struct CmpStates
 
 template<class T>
 class BestFirstSearch : public Searcher<T>{
-    priority_queue<State<T>*,vector<State<T>*>,/*std::greater<State<T>*>*/ CmpStates<T>> myQueue;
+    priority_queue<State<T>*,vector<State<T>*>, CmpStates<T>> myQueue;
     list<State<T>*> closed;
     list<State<T>*> backTrace(State<T>* state,State<T>* first) {
         list<State<T>*> trace;
@@ -96,6 +96,8 @@ public:
                 }
             }
         }
+        list<State<T>*> empList;
+        return empList;
     }
 };
 

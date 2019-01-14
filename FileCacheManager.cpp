@@ -16,6 +16,7 @@ void FileCacheManager::loadToMap() {
         // while there are more lines
         while (getline(file, line)) {
             // take care of one line from the text
+            line = line + '\n';
             parseFile(line);
         }
     } else {
@@ -26,11 +27,11 @@ void FileCacheManager::loadToMap() {
 }
 
 void FileCacheManager::parseFile(string line) {
-    if (line != "$$") {
+    if (line != "$$\n") {
         allProblemSolution += line;
     } else {
         string problem = allProblemSolution.substr(0, allProblemSolution.find('$'));
-        string solution = allProblemSolution.substr(allProblemSolution.find('$') + 1);
+        string solution = allProblemSolution.substr(allProblemSolution.find('$') + 2);
         myMap.insert(make_pair(problem,solution));
         allProblemSolution = "";
     }
@@ -53,7 +54,7 @@ void FileCacheManager::saveInCache(string problem, string solution) {
     if (!(file.is_open())) {
         file.open(solutionsFile, ios::trunc | ios::out);
     }
-    file << problem << "\n" << "$\n" << solution << "\n$$" << endl;
+    file << problem << "$\n" << solution << "\n$$\n";
     file.flush();
     file.close();
 }

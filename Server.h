@@ -6,9 +6,23 @@
 #define PROJECT2_SERVER_H
 
 #include "ClientHandler.h"
+#include <pthread.h>
+#include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+#include <mutex>
 
-class Server {
-    virtual void open(int port, ClientHandler* MyHandler) = 0;
-    virtual void stop() = 0;
-};
+namespace server_side {
+    class Server {
+    protected:
+        int myListenSocket;
+        ClientHandler* myClientHandler;
+    public:
+        virtual void open(int port, ClientHandler *MyHandler) = 0;
+        virtual void stop() = 0;
+    };
+}
 #endif //PROJECT2_SERVER_H

@@ -11,8 +11,9 @@ int boot::Main::main(char* portS) {
     FileCacheManager* myFileCache = new FileCacheManager();
    // MyReverseClientHandler* myClientHandler = new MyReverseClientHandler();
     MyTestClientHandler* myClientHandler = new MyTestClientHandler(mySolver, myFileCache);
-    MySerialServer* mySerialServer = new MySerialServer();
-    mySerialServer->open(port, myClientHandler);
+   // MySerialServer* mySerialServer = new MySerialServer();
+   MyParallelServer* myParallelServer = new MyParallelServer();
+    myParallelServer->open(port, myClientHandler);
    // StringReverse* mySolver = new StringReverse();
     while (1);
     return 0;

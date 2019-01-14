@@ -2,117 +2,79 @@
 // Created by sharon on 13/01/19.
 //
 
-/*#ifndef PROJECT2_ASTAR_H
+#ifndef PROJECT2_ASTAR_H
 #define PROJECT2_ASTAR_H
 
 #include "Searcher.h"
 
 template<class T>
-class AStar : public Searcher<T>{
-    list<State<T>> vertexList;
+struct CmpStates
+{
+    bool operator()(const State<T>* left, const State<T>* right) const
+    {
+        return *left > *right;
+    }
+};
+
+template<class T>
+class AStar : public Searcher<T> {
+    priority_queue<State<T>*,vector<State<T>*>, CmpStates<T>> myQueue;
+    list<State<T>*> closed;
+    double costTillCurr(State<T>* curr,State<T>* first){
+        double totalCost = 0;
+        while (!(*curr == *first)) {
+            totalCost += curr->getCost();
+            curr = curr->getCameFrom();
+        }
+        return totalCost;
+    }
+    list<State<T>*> backTrace(State<T>* state,State<T>* first) {
+        list<State<T>*> trace;
+        while (!(*state == *first)) {
+            trace.push_back(state);
+            state = state->getCameFrom();
+        }
+        trace.push_back(state);
+        return trace;
+    }
 public:
-    list<State<T>> search(Searchable<T>* s) {
-            State<T> curr = s->getInitialState();
-            if (curr == s->getGoalState()) {
-                return vertexList;
+    list<State<T>*> search(Searchable<T> *s) {
+        s->initializeMatrix();
+        State<T>* first = s->getInitialState();
+
+        // inherited from Searcher
+        myQueue.push(first);
+        while (myQueue.size() > 0) {
+            // inherited from Searcher, removes the best state
+            State<T>* n = myQueue.top();
+            myQueue.pop();
+            closed.push_back(n);
+            // private method, back traces through the parents
+            // calling the delegated method, returns a list of states with n as a parent
+            if (*n == *s->getGoalState()) {
+                return backTrace(n, first);
             }
+            list<State<T>*> succerssors = s->getAllPossibleStates(n);
+            double currCost = costTillCurr(n,first) + 1;
+            for (auto it : succerssors) {
+                if (openListContains(it)) {
+                    // find the real address of n, and set came from of it
+                    if (costTillCurr(it, first) > currCost) {
 
-            bool closedList[(X_MAX / X_STEP)][(Y_MAX / Y_STEP)];
 
-            //Initialize whole map
-            //Node allMap[50][25];
-            array<array < Node, (Y_MAX / Y_STEP)>, (X_MAX / X_STEP)> allMap;
-            for (int x = 0; x < (X_MAX / X_STEP); x++) {
-                for (int y = 0; y < (Y_MAX / Y_STEP); y++) {
-                    allMap[x][y].fCost = FLT_MAX;
-                    allMap[x][y].gCost = FLT_MAX;
-                    allMap[x][y].hCost = FLT_MAX;
-                    allMap[x][y].parentX = -1;
-                    allMap[x][y].parentY = -1;
-                    allMap[x][y].x = x;
-                    allMap[x][y].y = y;
-
-                    closedList[x][y] = false;
-                }
-            }
-
-            //Initialize our starting list
-            int x = player.x;
-            int y = player.y;
-            allMap[x][y].fCost = 0.0;
-            allMap[x][y].gCost = 0.0;
-            allMap[x][y].hCost = 0.0;
-            allMap[x][y].parentX = x;
-            allMap[x][y].parentY = y;
-
-            vector<State<T>> openList;
-            openList.emplace_back(allMap[x][y]);
-            bool destinationFound = false;
-
-            while (!openList.empty()&&openList.size()<(X_MAX / X_STEP)*(Y_MAX / Y_STEP)) {
-                State<T> node;
-                do {
-                    //This do-while loop could be replaced with extracting the first
-                    //element from a set, but you'd have to make the openList a set.
-                    //To be completely honest, I don't remember the reason why I do
-                    //it with a vector, but for now it's still an option, although
-                    //not as good as a set performance wise.
-                    float temp = FLT_MAX;
-                    for (auto it : openList) {
-                        State<T> n = *it;
-                        if (n.fCost < temp) {
-                            temp = n.fCost;
-                            itNode = it;
-                        }
                     }
-                    node = *itNode;
-                    openList.erase(itNode);
-                } while (isValid(node.x, node.y) == false);
-
-                x = node.x;
-                y = node.y;
-                closedList[x][y] = true;
-
-                //For each neighbour starting from North-West to South-East
-                for (int newX = -1; newX <= 1; newX++) {
-                    for (int newY = -1; newY <= 1; newY++) {
-                        double gNew, hNew, fNew;
-                        if (isValid(x + newX, y + newY)) {
-                            if (isDestination(x + newX, y + newY, s->getGoalState()))
-                            {
-                                //Destination found - make path
-                                allMap[x + newX][y + newY].parentX = x;
-                                allMap[x + newX][y + newY].parentY = y;
-                                destinationFound = true;
-                                return makePath(allMap, s->getGoalState());
-                            }
-                            else if (closedList[x + newX][y + newY] == false)
-                            {
-                                gNew = node.gCost + 1.0;
-                                hNew = calculateH(x + newX, y + newY, s->getGoalState());
-                                fNew = gNew + hNew;
-                                // Check if this path is better than the one already present
-                                if (allMap[x + newX][y + newY].fCost == FLT_MAX ||
-                                    allMap[x + newX][y + newY].fCost > fNew)
-                                {
-                                    // Update the details of this neighbour node
-                                    allMap[x + newX][y + newY].fCost = fNew;
-                                    allMap[x + newX][y + newY].gCost = gNew;
-                                    allMap[x + newX][y + newY].hCost = hNew;
-                                    allMap[x + newX][y + newY].parentX = x;
-                                    allMap[x + newX][y + newY].parentY = y;
-                                    openList.emplace_back(allMap[x + newX][y + newY]);
-                                }
-                            }
-                        }
+                    updateCameFrom(it, n);
+                    myQueue.push(it);
+                } else {
+                    if (!openListContains(it)) {
+                        // find the real address of n, and update its came from
+                        updateList(n, it);
                     }
                 }
-            }
-            if (destinationFound == false) {
-                cout << "Destination not found" << endl;
-                return vertexList;
             }
         }
+        list<State<T> *> empList;
+        return empList;
+    }
 };
 #endif //PROJECT2_ASTAR_H
- */

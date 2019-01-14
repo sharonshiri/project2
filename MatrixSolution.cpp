@@ -26,7 +26,9 @@ string MatrixSolution::getPairString(list<State<pair<int,int>>*> list) {
 string MatrixSolution::getDirectionString(list<State<pair<int,int>>*> myList) {
     string direction = "";
     // list is from the start to final
-    // reverse list
+    if (myList.empty()) {
+        return "-1";
+    }
     list<State<pair<int,int>>*>::iterator it1 = myList.begin();
     list<State<pair<int,int>>*>::iterator it2 = myList.begin();
     it2++;
