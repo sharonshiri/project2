@@ -16,9 +16,11 @@ class MatrixSearchable : public Searchable<pair<int,int>> {
     int myRow,myCol;
 public:
     void initializeMatrix() {
-        for (auto i : myMatrix) {
-            for (auto j : i) {
-                j.setCameFrom(nullptr);
+        vector<vector<State<pair<int,int>>>>::iterator i;
+        vector<State<pair<int,int>>>::iterator j;
+        for (i = myMatrix.begin(); i != myMatrix.end(); i++) {
+            for (j = (*i).begin(); j != (*i).end(); j++) {
+                myMatrix[(*j).getLoc().first][(*j).getLoc().second].setCameFrom(nullptr);
             }
         }
     }

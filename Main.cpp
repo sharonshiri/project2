@@ -7,13 +7,13 @@
 
 int boot::Main::main(char* portS) {
     int port = atoi(portS);
+    MatrixSolver* mySolver = new MatrixSolver();
+    FileCacheManager* myFileCache = new FileCacheManager();
    // MyReverseClientHandler* myClientHandler = new MyReverseClientHandler();
-    MyTestClientHandler* myClientHandler = new MyTestClientHandler();
+    MyTestClientHandler* myClientHandler = new MyTestClientHandler(mySolver, myFileCache);
     MySerialServer* mySerialServer = new MySerialServer();
     mySerialServer->open(port, myClientHandler);
    // StringReverse* mySolver = new StringReverse();
-    MatrixSolver* mySolver = new MatrixSolver();
-    myClientHandler->setSolver(mySolver);
     while (1);
     return 0;
 }

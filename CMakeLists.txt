@@ -4,5 +4,5 @@ project(project2)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS -pthread)
 
-add_executable(project2 Server.h ClientHandler.h MySerialServer.cpp MySerialServer.h MyTestClientHandler.cpp MyTestClientHandler.h Solver.h CacheManager.cpp CacheManager.h FileCacheManager.cpp FileCacheManager.h Main.cpp Main.h MatrixSolver.h StringReverse.h main.cpp MyReverseClientHandler.cpp MyReverseClientHandler.h MatrixSolver.cpp State.h
+add_executable(project2 Server.h ClientHandler.h MySerialServer.cpp MySerialServer.h MyTestClientHandler.cpp MyTestClientHandler.h Solver.h CacheManager.h FileCacheManager.cpp FileCacheManager.h Main.cpp Main.h MatrixSolver.h StringReverse.h main.cpp MyReverseClientHandler.cpp MyReverseClientHandler.h MatrixSolver.cpp State.h
         DFS.h Searchable.h Searcher.h MatrixSearchable.h MatrixSolution.cpp MatrixSolution.h BestFirstSearch.h BFS.h AStar.h MyParallelServer.cpp MyParallelServer.h)

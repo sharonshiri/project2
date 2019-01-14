@@ -5,13 +5,22 @@
 #include "MyTestClientHandler.h"
 
 
+MyTestClientHandler::MyTestClientHandler(Solver* solver, CacheManager* cache) {
+    myCacheManager = cache;
+    mySolver = solver;
+}
+
 void MyTestClientHandler::handleClient(string read, string& write) {
     if (collectProblem(read)) {
-        // get it from cache
-        // if not in cache, then
-        string temp = mySolver->solve(problem);
-        write = temp;
-        // save in cache
+        string solution = myCacheManager->getSolution(problem);
+        if (solution.length() > 0)
+        {
+            write = solution;
+        } else {
+            solution = mySolver->solve(problem);
+            myCacheManager->saveInCache(problem, solution);
+            write = solution;
+        }
     }
 }
 
@@ -50,8 +59,4 @@ string MyTestClientHandler::getCompleteMessage() {
     stringToParse = stringToParse.substr(rc + 1, stringToParse.length());
     // return the message until \n
     return temp;
-}
-
-void MyTestClientHandler::setSolver(Solver* solver) {
-    mySolver = solver;
 }

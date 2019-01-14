@@ -14,14 +14,14 @@ using namespace std;
 
 class MyTestClientHandler : public ClientHandler {
     Solver* mySolver;
-    //CacheManager* myCacheManager;
+    CacheManager* myCacheManager;
     bool collectProblem(string);
     string stringToParse = "";
     string getCompleteMessage();
     string problem = "";
 public:
+    MyTestClientHandler (Solver*, CacheManager*);
     void handleClient(string read, string &write);
-    void setSolver(Solver*);
 };
 
 

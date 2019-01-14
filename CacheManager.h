@@ -5,9 +5,13 @@
 #ifndef PROJECT2_CHACHEMANAGER_H
 #define PROJECT2_CHACHEMANAGER_H
 
+#include <string>
+using namespace std;
 
 class CacheManager {
-
+public:
+    virtual string getSolution(string) = 0;
+    virtual void saveInCache(string,string) = 0;
 };
 
 

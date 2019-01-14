@@ -14,6 +14,8 @@
 #include "MyReverseClientHandler.h"
 #include "StringReverse.h"
 
+#include "FileCacheManager.h"
+
 using namespace std;
 
 namespace boot {

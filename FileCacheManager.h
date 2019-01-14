@@ -6,8 +6,21 @@
 #define PROJECT2_FILECACHEMANAGER_H
 
 #include "CacheManager.h"
-class FileCacheManager : public CacheManager{
+#include <unordered_map>
+#include <fstream>
+#include <iostream>
 
+
+class FileCacheManager : public CacheManager{
+    unordered_map<string,string> myMap;
+    string solutionsFile = "solutionFile.txt";
+    string allProblemSolution = "";
+    void parseFile(string line);
+    void loadToMap();
+public:
+    FileCacheManager();
+    string getSolution(string);
+    void saveInCache(string,string);
 };
 
 

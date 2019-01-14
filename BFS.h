@@ -6,6 +6,7 @@
 template<class T>
 class BFS : public Searcher<T> {
     list<State<T>*> visited;
+    queue<State<T>*> myQueue;
     list<State<T>*> backTrace(State<T>* state,State<T>* first) {
         list<State<T>*> trace;
         while (!(*state == *first)) {
@@ -23,10 +24,21 @@ class BFS : public Searcher<T> {
         }
         return false;
     }
+    bool myQueueContains(State<T>* state) {
+        queue<State<T>*> tempQueue = myQueue;
+        while (tempQueue.size() > 0) {
+            State<T>* temp = tempQueue.front();
+            if(*temp == *state) {
+                return true;
+            }
+            tempQueue.pop();
+        }
+        return false;
+    }
+
 public:
     list<State<T>*> search(Searchable<T>* s) {
-        // Create a queue for BFS
-        queue<State<T>*> myQueue;
+        s->initializeMatrix();
         // Mark the current node as visited and enqueue it
         State<T>* curr = s->getInitialState();
         myQueue.push(curr);
@@ -47,7 +59,7 @@ public:
             // 'i' will be used to get all adjacent
             for (auto i : adj)
             {
-                if (!visitedContains(i))
+                if (!visitedContains(i) && !myQueueContains(i))
                 {
                     i->setCameFrom(curr);
                     myQueue.push(i);
