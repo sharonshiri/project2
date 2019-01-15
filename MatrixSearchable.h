@@ -44,24 +44,28 @@ public:
         int col = s->getLoc().second;
         list<State<pair<int,int>>*> possibleStates;
         State<pair<int,int>> tempState;
+        //up
         if (row > 0) {
             tempState = myMatrix[row-1][col];
             if (tempState.getCost() != -1) {
                 possibleStates.push_back(&myMatrix[row - 1][col]);
             }
         }
+        //left
         if (col > 0) {
             tempState = myMatrix[row][col-1];
             if (tempState.getCost() != -1) {
                 possibleStates.push_back(&myMatrix[row][col - 1]);
             }
         }
+        //down
         if (row < myRow-1) {
             tempState = myMatrix[row+1][col];
             if (tempState.getCost() != -1) {
                 possibleStates.push_back(&myMatrix[row + 1][col]);
             }
         }
+        //right
         if (col < myCol-1) {
             tempState = myMatrix[row][col+1];
             if (tempState.getCost() != -1) {

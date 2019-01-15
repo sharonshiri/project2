@@ -1,32 +1,27 @@
-//
-// Created by sharon on 13/01/19.
-//
-
-#ifndef PROJECT2_MYPARALLELSERVER_H
-#define PROJECT2_MYPARALLELSERVER_H
+#ifndef PROJECT2_TRYPARALLEL_H
+#define PROJECT2_TRYPARALLEL_H
 
 #include "Server.h"
 #include <queue>
 #include <mutex>
+#include <list>
 
 using namespace server_side;
 
 class MyParallelServer : public Server{
+    bool finishServer = false;
 public:
     struct sockaddr_in address;
     int addrLen;
     void open(int port, ClientHandler* clientHandler);
     void stop();
     void listenAcceptThread();
-    void handleClientThread();
+    void readerThread(int,pthread_t*);
     bool continueGetClients = true;
-    bool continueHandleClients = true;
     pthread_t threadListenAllClients;
-    pthread_t threadForClient;
-    queue<int> clientSocketsQueue;
-    mutex mtxForMyQueue;
+    list <pthread_t*>  listOfReaderThreads;
+    bool getFinishServer();
     ~MyParallelServer();
 };
 
-
-#endif //PROJECT2_MYPARALLELSERVER_H
+#endif //PROJECT2_TRYPARALLEL_H

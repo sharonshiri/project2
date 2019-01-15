@@ -22,6 +22,8 @@ template<class T>
 class BestFirstSearch : public Searcher<T>{
     priority_queue<State<T>*,vector<State<T>*>, CmpStates<T>> myQueue;
     list<State<T>*> closed;
+    int numberOfNodes;
+    double costOfNodes;
     list<State<T>*> backTrace(State<T>* state,State<T>* first) {
         list<State<T>*> trace;
         while (!(*state == *first)) {
@@ -69,12 +71,16 @@ class BestFirstSearch : public Searcher<T>{
 
 public:
     list<State<T>*> search(Searchable<T>* s) {
+        numberOfNodes = 0;
+        costOfNodes =0;
         s->initializeMatrix();
         // inherited from Searcher
         myQueue.push(s->getInitialState());
         while (myQueue.size() > 0) {
             // inherited from Searcher, removes the best state
             State<T>* n = myQueue.top();
+            numberOfNodes++;
+            costOfNodes+= n->getCost();
             myQueue.pop();
             closed.push_back(n);
             // private method, back traces through the parents
@@ -98,6 +104,12 @@ public:
         }
         list<State<T>*> empList;
         return empList;
+    }
+    int getNumberOfNodesEvaluated() {
+        return numberOfNodes;
+    }
+    double getCostEvaluated() {
+        return costOfNodes;
     }
 };
 

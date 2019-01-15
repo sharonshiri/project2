@@ -6,6 +6,8 @@
 
 template<class T>
 class DFS : public Searcher<T>{
+    int numberOfNodes;
+    double costOfNodes;
     list<State<T>*> visited;
     bool visitedContains(State<T>* state) {
         for (auto it: visited) {
@@ -17,6 +19,8 @@ class DFS : public Searcher<T>{
     }
 public:
     list<State<T>*> search(Searchable<T>* s) {
+        numberOfNodes = 0;
+        costOfNodes=0;
         s->initializeMatrix();
         // Create a stack for DFS
         stack<State<T>*> myStack;
@@ -27,6 +31,8 @@ public:
             // Pop a vertex from stack and print it
             curr = myStack.top();
             myStack.pop();
+            numberOfNodes++;
+            costOfNodes+=curr->getCost();
             // Stack may contain same vertex twice. So
             // we need to print the popped item only
             // if it is not visited.
@@ -57,6 +63,13 @@ public:
         }
         visited.reverse();
         return visited;
+    }
+
+    int getNumberOfNodesEvaluated() {
+        return numberOfNodes;
+    }
+    double getCostEvaluated() {
+        return costOfNodes;
     }
 };
 

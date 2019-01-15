@@ -1,9 +1,17 @@
 //
-// Created by sharon on 13/01/19.
+// Created by sharon on 15/01/19.
 //
 
+//#include "tryParallel.h"
 
 #include "MyParallelServer.h"
+
+struct params {
+    pthread_t* myThread;
+    int mySocket;
+    MyParallelServer* myClass;
+};
+
 
 /*
  * Function Name: threadFunc
@@ -11,6 +19,7 @@
  * Output: void*
  * Function Operation: read as long as the simulator is on
  */
+
 void* listenThreadFunc(void *arg) {
     // get this (threadFunc is C function, and we want to have Server functions)
     MyParallelServer* myServer = (MyParallelServer*) arg;
@@ -19,10 +28,11 @@ void* listenThreadFunc(void *arg) {
     return nullptr;
 }
 
-void* handleThreadFunc(void *arg) {
+void* readerThreadFunc(void *arg) {
     // get this (threadFunc is C function, and we want to have Server functions)
-    MyParallelServer* myServer = (MyParallelServer*) arg;
-    myServer->handleClientThread();
+    params* myParam = (params*) arg;
+    myParam->myClass->readerThread(myParam->mySocket, myParam->myThread);
+    free(myParam);
     // return null pointer
     return nullptr;
 }
@@ -36,7 +46,7 @@ void MyParallelServer::listenAcceptThread() {
     if (listen(myListenSocket, SOMAXCONN) < 0) {
         throw runtime_error("listen failed");
     }
-
+    int i=0;
     while (continueGetClients) {
         setsockopt(myListenSocket, SOL_SOCKET, SO_RCVTIMEO, (char *) &timeout,
                    sizeof(timeout));
@@ -48,69 +58,58 @@ void MyParallelServer::listenAcceptThread() {
 
         cout << myClientSocket << " accepeted!" << endl;
 
+
         if (myClientSocket < 0) {
             if (errno == EWOULDBLOCK) {
                 stop();
                 cout << "timeout!" << endl;
-            } else {
-                throw runtime_error("accept failed");
             }
-        }
-        else {
+        }else {
+            // create the readerThread for the socket
+            pthread_t* threadForClient = (pthread_t*) malloc(sizeof(pthread_t));
 
-            // start of lock
-            mtxForMyQueue.lock();
-            clientSocketsQueue.push(myClientSocket);
-            // unlock
-            mtxForMyQueue.unlock();
+            //pair <tryParallel*,int> threadArgs=make_pair(this,myClientSocket);
+
+            params* myParams = (params*) malloc(sizeof(params));
+            myParams->myClass = this;
+            myParams->mySocket = myClientSocket;
+            myParams->myThread = threadForClient;
+
+            pthread_create(threadForClient, nullptr, readerThreadFunc, myParams);
+            listOfReaderThreads.push_back(threadForClient);
         }
-        timeout.tv_sec = 30;
+        timeout.tv_sec = 10;
     }
 }
 
-void MyParallelServer::handleClientThread() {
+void MyParallelServer::readerThread(int socket, pthread_t* thread) {
+    cout << "in reader thread" << socket << endl;
     ssize_t readVars;
     char readBuffer[1025] = {0};
 
-
-    while((!(clientSocketsQueue.empty()) || continueHandleClients)) {
-        if (!(clientSocketsQueue.empty())){
-            mtxForMyQueue.lock();
-            int tempSocket = clientSocketsQueue.front();
-            clientSocketsQueue.pop();
-            mtxForMyQueue.unlock();
-            string writeString="";
-            string readString="";
-            // continue read data from client
-            do {
-                cout << " reading from " << tempSocket << endl;
-
-                // read from simulator
-                readVars = read(tempSocket, readBuffer, 1024);
-                cout << "read " << readVars << endl;
-
-                if (readVars > 0) {
-                    // use it as string, after the num of bits it is not relevant
-                    readBuffer[readVars] = 0;
-                    readString = readBuffer;
-                    cout << "before handle client" << endl;
-                    cout << readString << endl;
-                    cout << writeString << endl;
-                    myClientHandler->handleClient(readString, writeString);
-                    cout << "after handle client" << endl;
-                }
-            } while (writeString.length() == 0);
-            cout << "result === " << writeString << endl;
-            send(tempSocket, writeString.c_str(), writeString.length(), 0);
-
-            if (tempSocket != -1) {
-                close(tempSocket);
-            }
-        } else {
-            usleep(100000);
+    string writeString="";
+    string readString="";
+    // continue read data from client
+    do {
+        // read from simulator
+        readVars = read(socket, readBuffer, 1024);
+        if (readVars > 0) {
+            // use it as string, after the num of bits it is not relevant
+            readBuffer[readVars] = 0;
+            readString += readBuffer;
+            myClientHandler->handleClient(readString, writeString);
         }
+    } while (writeString.length() == 0);
+
+    cout << "result === " << writeString << endl;
+    send(socket, writeString.c_str(), writeString.length(), 0);
+    listOfReaderThreads.remove(thread);
+    free(thread);
+    close(socket);
+    if (listOfReaderThreads.empty() && !continueGetClients) {
+        finishServer = true;
     }
-    delete(this);
+    cout << "out reader thread" << socket << endl;
 }
 
 void MyParallelServer::open(int port, ClientHandler* clientHandler) {
@@ -133,22 +132,30 @@ void MyParallelServer::open(int port, ClientHandler* clientHandler) {
     }
 
     pthread_create(&threadListenAllClients, nullptr, listenThreadFunc, this);
-    // create the thread
-    pthread_create(&threadForClient, nullptr, handleThreadFunc, this);
+}
+
+
+bool MyParallelServer::getFinishServer() {
+    return finishServer;
 }
 
 void MyParallelServer::stop(){
     continueGetClients = false;
+    if (listOfReaderThreads.empty() && !continueGetClients) {
+        finishServer = true;
+    }
 }
+
+
 
 /*
  * Function Name: ~Server
  * Input: -
  * Output: -
  * Function Operation: destructor
- */
+*/
 MyParallelServer::~MyParallelServer() {
+    // close listener
     close(myListenSocket);
     pthread_join(threadListenAllClients, nullptr);
-    pthread_join(threadForClient, nullptr);
 }

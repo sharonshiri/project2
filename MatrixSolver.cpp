@@ -5,9 +5,7 @@
 #include "MatrixSolver.h"
 
 string MatrixSolver::solve(string myString) {
-    //parseSizeOfMatrix(myString, row, col);
-    //string startString = parseStartState(myString);
-    //string finalString = parseFinalState(myString);
+    mtxForSolver.lock();
     myMatrix.clear();
     rowNumber = count(myString.begin(), myString.end(), '\n') - 2;
     createMatrix(myString);
@@ -15,7 +13,9 @@ string MatrixSolver::solve(string myString) {
     string finalString = parseFinalState(myString);
     State<pair<int, int>> start = getStateFromMatrix(startString);
     State<pair<int, int>> final = getStateFromMatrix(finalString);
-    return findShortestWay(start, final);
+    string finalWay = findShortestWay(start, final);
+    mtxForSolver.unlock();
+    return finalWay;
 }
 
 
@@ -95,23 +95,36 @@ State<pair<int, int>> MatrixSolver::getStateFromMatrix(string loc) {
 }
 
 string MatrixSolver::findShortestWay(State<pair<int, int>> start,State<pair<int, int>> final) {
-    MatrixSearchable<pair<int,int>>* mySearchable = new MatrixSearchable<pair<int,int>>
-                    (myMatrix,start,final,rowNumber,colNumber);
+    MatrixSearchable<pair<int,int>> mySearchable(myMatrix,start,final,rowNumber,colNumber);
 
-    //DFS<pair<int,int>> myDFS;
-    //BestFirstSearch<pair<int,int>> myBestFirst;
-    //BFS<pair<int,int>> myBFS;
+    DFS<pair<int,int>> myDFS;
+    BestFirstSearch<pair<int,int>> myBestFirst;
+    BFS<pair<int,int>> myBFS;
     AStar<pair<int,int>> myAStar;
 
-    //list<State<pair<int,int>>*> tempList1 = myDFS.search(mySearchable);
-    //list<State<pair<int,int>>*> tempList2 = myBestFirst.search(mySearchable);
-    //list<State<pair<int,int>>*> tempList3 = myBFS.search(mySearchable);
-    list<State<pair<int,int>>*> tempList4 = myAStar.search(mySearchable);
+    list<State<pair<int,int>>*> tempList1 = myDFS.search(&mySearchable);
+    list<State<pair<int,int>>*> tempList2 = myBestFirst.search(&mySearchable);
+    list<State<pair<int,int>>*> tempList3 = myBFS.search(&mySearchable);
+    list<State<pair<int,int>>*> tempList4 = myAStar.search(&mySearchable);
+
+    MatrixSolution mySolution;
+    cout << "DFS:\n" <<mySolution.getDirectionString(tempList1) << endl;
+    cout << mySolution.getPairString(tempList1, &myDFS) << endl;
+
+    cout << "BFS:\n"<< mySolution.getDirectionString(tempList3) << endl;
+    cout << mySolution.getPairString(tempList3, &myBFS) << endl;
+
+    cout << "BEST_FIRST:\n"<< mySolution.getDirectionString(tempList2) << endl;
+    cout << mySolution.getPairString(tempList2, &myBestFirst) << endl;
+
+    cout << "ASTAR:\n"<< mySolution.getDirectionString(tempList4) << endl;
+    cout << mySolution.getPairString(tempList4,&myAStar) << endl;
+
 
     list<list<State<pair<int,int>>*>> myList;
-   // myList.push_back(tempList1);
-   // myList.push_back(tempList2);
-   // myList.push_back(tempList3);
+    myList.push_back(tempList1);
+    myList.push_back(tempList2);
+    myList.push_back(tempList3);
     myList.push_back(tempList4);
 
     string minSolution = chooseBestAlg(myList);

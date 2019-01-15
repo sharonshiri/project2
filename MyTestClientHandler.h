@@ -15,8 +15,7 @@ using namespace std;
 class MyTestClientHandler : public ClientHandler {
     Solver* mySolver;
     CacheManager* myCacheManager;
-    string problem = "";
-    void deleteSpaces();
+    void deleteSpaces(string problem);
 public:
     MyTestClientHandler (Solver*, CacheManager*);
     void handleClient(string read, string &write);

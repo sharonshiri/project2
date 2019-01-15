@@ -17,9 +17,10 @@ double MatrixSolution::calcCost(list<State<pair<int,int>>*> list) {
     return cost;
 }
 
-string MatrixSolution::getPairString(list<State<pair<int,int>>*> list) {
+string MatrixSolution::getPairString(list<State<pair<int,int>>*> list, Searcher<pair<int,int>>* searcher) {
     string pair = "";
-    pair = to_string(calcCost(list)) + "," + to_string(list.size());
+
+    pair = to_string(calcCost(list)) + "," + to_string(searcher->getNumberOfNodesEvaluated());
     return pair;
 }
 

@@ -46,6 +46,7 @@ string FileCacheManager::getSolution(string problem) {
 }
 
 void FileCacheManager::saveInCache(string problem, string solution) {
+    mtxForSave.lock();
     //save to map
     myMap.insert(make_pair(problem,solution));
     //save to file
@@ -57,4 +58,5 @@ void FileCacheManager::saveInCache(string problem, string solution) {
     file << problem << "$\n" << solution << "\n$$\n";
     file.flush();
     file.close();
+    mtxForSave.unlock();
 }

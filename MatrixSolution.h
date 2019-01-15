@@ -6,6 +6,7 @@
 #define PROJECT2_SOLUTION_H
 
 #include "State.h"
+#include "Searcher.h"
 #include <list>
 #include <string>
 
@@ -16,7 +17,7 @@ class MatrixSolution {
 public:
 
     double calcCost(list<State<pair<int,int>>*> list);
-    string getPairString(list<State<pair<int,int>>*>);
+    string getPairString(list<State<pair<int,int>>*> list,Searcher<pair<int,int>>* searcher);
     string getDirectionString(list<State<pair<int,int>>*>);
 };
 

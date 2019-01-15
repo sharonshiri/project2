@@ -11,24 +11,25 @@ MyTestClientHandler::MyTestClientHandler(Solver* solver, CacheManager* cache) {
 }
 
 void MyTestClientHandler::handleClient(string read, string& write) {
-    problem += read;
-    if (problem.find("end") != string::npos) {
-        problem = problem.substr(0, problem.find("end"));
-        deleteSpaces();
-        string solution = myCacheManager->getSolution(problem);
+    write = "";
+    if (read.find("end") != string::npos) {
+        cout << read << endl;
+        read = read.substr(0, read.find("end"));
+        deleteSpaces(read);
+        string solution = myCacheManager->getSolution(read);
         if (solution.length() > 0)
         {
             write = solution;
         } else {
-            solution = mySolver->solve(problem);
-            myCacheManager->saveInCache(problem, solution);
+            solution = mySolver->solve(read);
+            myCacheManager->saveInCache(read, solution);
             write = solution;
         }
-        problem = "";
+        read = "";
     }
 }
 
-void MyTestClientHandler::deleteSpaces() {
+void MyTestClientHandler::deleteSpaces(string problem) {
     while (problem.length() > 0) {
         unsigned long rc = problem.find(' ');
         if (rc != string::npos) {

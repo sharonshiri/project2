@@ -7,6 +7,8 @@ template<class T>
 class BFS : public Searcher<T> {
     list<State<T>*> visited;
     queue<State<T>*> myQueue;
+    int numberOfNodes;
+    double costOfNodes;
     list<State<T>*> backTrace(State<T>* state,State<T>* first) {
         list<State<T>*> trace;
         while (!(*state == *first)) {
@@ -39,6 +41,8 @@ class BFS : public Searcher<T> {
 public:
     list<State<T>*> search(Searchable<T>* s) {
         s->initializeMatrix();
+        numberOfNodes = 0;
+        costOfNodes = 0;
         // Mark the current node as visited and enqueue it
         State<T>* curr = s->getInitialState();
         myQueue.push(curr);
@@ -47,6 +51,8 @@ public:
         {
             // Dequeue a vertex from queue and print it
             curr = myQueue.front();
+            numberOfNodes++;
+            costOfNodes += curr->getCost();
             if(*curr == *(s->getGoalState())){
                 return backTrace(curr,s->getInitialState());
             }
@@ -66,6 +72,12 @@ public:
                 }
             }
         }
+    }
+    int getNumberOfNodesEvaluated() {
+        return numberOfNodes;
+    }
+    double getCostEvaluated() {
+        return costOfNodes;
     }
 };
 

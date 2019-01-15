@@ -10,6 +10,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <mutex>
 
 #include "Solver.h"
 #include "MatrixSearchable.h"
@@ -32,6 +33,7 @@ class MatrixSolver : public Solver {
     State<pair<int, int>> getStateFromMatrix(string);
     string chooseBestAlg(list<list<State<pair<int,int>>*>> myList);
     string findShortestWay(State<pair<int, int>>,State<pair<int, int>>);
+    mutex mtxForSolver;
 public:
     string solve(string stringMatrix);
 };

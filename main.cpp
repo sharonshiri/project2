@@ -10,6 +10,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     boot::Main myMain;
-    myMain.main(argv[1]);
-    return 0;
+    if (myMain.main(argv[1]) == 0) {
+        return 0;
+    }
 }

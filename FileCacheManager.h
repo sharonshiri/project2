@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <iostream>
-
+#include <mutex>
 
 class FileCacheManager : public CacheManager{
     unordered_map<string,string> myMap;
@@ -17,6 +17,7 @@ class FileCacheManager : public CacheManager{
     string allProblemSolution = "";
     void parseFile(string line);
     void loadToMap();
+    mutex mtxForSave;
 public:
     FileCacheManager();
     string getSolution(string);
