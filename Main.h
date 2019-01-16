@@ -6,7 +6,6 @@
 #define PROJECT2_MYMAIN_H
 
 #include <cstdlib>
-#include "MySerialServer.h"
 #include "MyParallelServer.h"
 
 #include "MyTestClientHandler.h"
@@ -14,7 +13,6 @@
 #include "MatrixSolver.h"
 
 #include "MyReverseClientHandler.h"
-#include "StringReverse.h"
 
 #include "FileCacheManager.h"
 

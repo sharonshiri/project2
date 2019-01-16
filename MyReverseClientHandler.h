@@ -19,6 +19,7 @@ class MyReverseClientHandler : public ClientHandler{
 public:
     void handleClient(string read, string &write);
     void setSolver(Solver*);
+    ~MyReverseClientHandler() = default;
 };
 
 

@@ -8,10 +8,9 @@
 
 struct params {
     pthread_t* myThread;
-    int mySocket;
     MyParallelServer* myClass;
+    int mySocket;
 };
-
 
 /*
  * Function Name: threadFunc
@@ -40,13 +39,12 @@ void* readerThreadFunc(void *arg) {
 
 void MyParallelServer::listenAcceptThread() {
     timeval timeout;
-    timeout.tv_sec = 3000;
+    timeout.tv_sec = 300;
     timeout.tv_usec = 0;
 
     if (listen(myListenSocket, SOMAXCONN) < 0) {
         throw runtime_error("listen failed");
     }
-    int i=0;
     while (continueGetClients) {
         setsockopt(myListenSocket, SOL_SOCKET, SO_RCVTIMEO, (char *) &timeout,
                    sizeof(timeout));
@@ -56,9 +54,6 @@ void MyParallelServer::listenAcceptThread() {
                                      (struct sockaddr *) &address,
                                      (socklen_t *) &addrLen));
 
-        cout << myClientSocket << " accepeted!" << endl;
-
-
         if (myClientSocket < 0) {
             if (errno == EWOULDBLOCK) {
                 stop();
@@ -67,10 +62,8 @@ void MyParallelServer::listenAcceptThread() {
         }else {
             // create the readerThread for the socket
             pthread_t* threadForClient = (pthread_t*) malloc(sizeof(pthread_t));
-
-            //pair <tryParallel*,int> threadArgs=make_pair(this,myClientSocket);
-
             params* myParams = (params*) malloc(sizeof(params));
+
             myParams->myClass = this;
             myParams->mySocket = myClientSocket;
             myParams->myThread = threadForClient;
@@ -83,7 +76,6 @@ void MyParallelServer::listenAcceptThread() {
 }
 
 void MyParallelServer::readerThread(int socket, pthread_t* thread) {
-    cout << "in reader thread" << socket << endl;
     ssize_t readVars;
     char readBuffer[1025] = {0};
 
@@ -109,7 +101,6 @@ void MyParallelServer::readerThread(int socket, pthread_t* thread) {
     if (listOfReaderThreads.empty() && !continueGetClients) {
         finishServer = true;
     }
-    cout << "out reader thread" << socket << endl;
 }
 
 void MyParallelServer::open(int port, ClientHandler* clientHandler) {

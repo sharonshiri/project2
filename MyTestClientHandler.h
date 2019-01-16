@@ -19,6 +19,7 @@ class MyTestClientHandler : public ClientHandler {
 public:
     MyTestClientHandler (Solver*, CacheManager*);
     void handleClient(string read, string &write);
+    ~MyTestClientHandler() = default;
 };
 
 

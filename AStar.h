@@ -7,6 +7,8 @@
 
 #include "Searcher.h"
 #include <unordered_map>
+#include <cmath>
+#include <limits>
 
 using namespace std;
 

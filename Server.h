@@ -21,8 +21,9 @@ namespace server_side {
         int myListenSocket;
         ClientHandler* myClientHandler;
     public:
-        virtual void open(int port, ClientHandler *MyHandler) = 0;
-        virtual void stop() = 0;
+        void virtual open(int port, ClientHandler *MyHandler) = 0;
+        void virtual stop() = 0;
+        virtual ~Server() = default;
     };
 }
 #endif //PROJECT2_SERVER_H

@@ -95,6 +95,8 @@ State<pair<int, int>> MatrixSolver::getStateFromMatrix(string loc) {
 }
 
 string MatrixSolver::findShortestWay(State<pair<int, int>> start,State<pair<int, int>> final) {
+
+
     MatrixSearchable<pair<int,int>> mySearchable(myMatrix,start,final,rowNumber,colNumber);
 
     DFS<pair<int,int>> myDFS;
@@ -111,6 +113,7 @@ string MatrixSolver::findShortestWay(State<pair<int, int>> start,State<pair<int,
     cout << "DFS:\n" <<mySolution.getDirectionString(tempList1) << endl;
     cout << mySolution.getPairString(tempList1, &myDFS) << endl;
 
+
     cout << "BFS:\n"<< mySolution.getDirectionString(tempList3) << endl;
     cout << mySolution.getPairString(tempList3, &myBFS) << endl;
 
@@ -120,27 +123,36 @@ string MatrixSolver::findShortestWay(State<pair<int, int>> start,State<pair<int,
     cout << "ASTAR:\n"<< mySolution.getDirectionString(tempList4) << endl;
     cout << mySolution.getPairString(tempList4,&myAStar) << endl;
 
+    list<pair<int,list<State<pair<int,int>>*>>> myList;
+    myList.push_back(make_pair(myDFS.getNumberOfNodesEvaluated(), tempList1));
+    myList.push_back(make_pair(myBestFirst.getNumberOfNodesEvaluated(), tempList2));
+    myList.push_back(make_pair(myBFS.getNumberOfNodesEvaluated(), tempList3));
+    myList.push_back(make_pair(myAStar.getNumberOfNodesEvaluated(), tempList4));
 
-    list<list<State<pair<int,int>>*>> myList;
-    myList.push_back(tempList1);
-    myList.push_back(tempList2);
-    myList.push_back(tempList3);
-    myList.push_back(tempList4);
 
     string minSolution = chooseBestAlg(myList);
     return minSolution;
 }
 
-string MatrixSolver::chooseBestAlg(list<list<State<pair<int,int>>*>> myList) {
+string MatrixSolver::chooseBestAlg(list<pair<int,list<State<pair<int,int>>*>>> myList) {
     MatrixSolution mySolution;
-    list<State<pair<int,int>>*> minList = myList.front();
+    int minNodes = myList.front().first;
+    list<State<pair<int,int>>*> minList = myList.front().second;
     double minCost = mySolution.calcCost(minList);
     for (auto it : myList) {
-        if (!(it.empty())) {
-            double h = mySolution.calcCost(it);
-            if (h < minCost) {
-                minList = it;
-                minCost = mySolution.calcCost(it);
+        if (!(it.second.empty())) {
+            if (mySolution.calcCost(it.second) <= minCost) {
+                if (mySolution.calcCost(it.second) == minCost) {
+                    if (it.first < minNodes) {
+                        minList = it.second;
+                        minNodes = it.first;
+                        minCost = mySolution.calcCost(it.second);
+                    }
+                } else {
+                    minList = it.second;
+                    minNodes = it.first;
+                    minCost = mySolution.calcCost(it.second);
+                }
             }
         }
     }

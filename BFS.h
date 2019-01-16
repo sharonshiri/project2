@@ -72,6 +72,8 @@ public:
                 }
             }
         }
+        list<State<T>*> empList;
+        return empList;
     }
     int getNumberOfNodesEvaluated() {
         return numberOfNodes;

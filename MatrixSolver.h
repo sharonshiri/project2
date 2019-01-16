@@ -31,11 +31,12 @@ class MatrixSolver : public Solver {
     string parseStartState(string &myString);
     string parseFinalState(string &myString);
     State<pair<int, int>> getStateFromMatrix(string);
-    string chooseBestAlg(list<list<State<pair<int,int>>*>> myList);
+    string chooseBestAlg(list<pair<int,list<State<pair<int,int>>*>>> myList);
     string findShortestWay(State<pair<int, int>>,State<pair<int, int>>);
     mutex mtxForSolver;
 public:
     string solve(string stringMatrix);
+    ~MatrixSolver() = default;
 };
 
 

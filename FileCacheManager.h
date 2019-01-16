@@ -22,6 +22,7 @@ public:
     FileCacheManager();
     string getSolution(string);
     void saveInCache(string,string);
+    ~FileCacheManager() = default;
 };
 
 

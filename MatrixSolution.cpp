@@ -24,6 +24,12 @@ string MatrixSolution::getPairString(list<State<pair<int,int>>*> list, Searcher<
     return pair;
 }
 
+pair<double,int> MatrixSolution::getPair(list<State<pair<int,int>>*> list, Searcher<pair<int,int>>* searcher) {
+    pair<double,int> myPair = make_pair(calcCost(list), searcher->getNumberOfNodesEvaluated());
+    return myPair;
+}
+
+
 string MatrixSolution::getDirectionString(list<State<pair<int,int>>*> myList) {
     string direction = "";
     // list is from the start to final
@@ -39,10 +45,6 @@ string MatrixSolution::getDirectionString(list<State<pair<int,int>>*> myList) {
         it2++;
     }
 
-  /* while (currState->getCameFrom() != nullptr) {
-       direction = getCurrDirection(currState->getCameFrom(), currState) + "," + direction;
-       currState = currState->getCameFrom();
-   }*/
    direction.erase(direction.length() - 1,1);
    return direction;
 }
@@ -64,11 +66,5 @@ string MatrixSolution::getCurrDirection(State<pair<int,int>>* first, State<pair<
     if (firstJ < secondJ) {
         return "Right";
     }
+    return "";
 }
-
-/*bool MatrixSolution::operator<(MatrixSolution other) {
-    if (cost < other.cost) {
-        return true;
-    }
-    return false;
-}*/

@@ -8,7 +8,10 @@
 
 using namespace server_side;
 
+
+
 class MyParallelServer : public Server{
+
     bool finishServer = false;
 public:
     struct sockaddr_in address;
@@ -23,5 +26,7 @@ public:
     bool getFinishServer();
     ~MyParallelServer();
 };
+
+
 
 #endif //PROJECT2_TRYPARALLEL_H

@@ -12,6 +12,7 @@ class CacheManager {
 public:
     virtual string getSolution(string) = 0;
     virtual void saveInCache(string,string) = 0;
+    virtual ~CacheManager() = default;
 };
 
 

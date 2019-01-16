@@ -19,6 +19,7 @@ public:
     double calcCost(list<State<pair<int,int>>*> list);
     string getPairString(list<State<pair<int,int>>*> list,Searcher<pair<int,int>>* searcher);
     string getDirectionString(list<State<pair<int,int>>*>);
+    pair<double,int> getPair(list<State<pair<int,int>>*> list, Searcher<pair<int,int>>* searcher);
 };
 
 
